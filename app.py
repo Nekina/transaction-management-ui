@@ -25,6 +25,7 @@ def upd_transaction(id, new_transaction):
             transaction.update(new_transaction)
             break
 
+# Delete a single transaction
 def del_transaction(id):
     for i, transaction in enumerate(transactions):
         if transaction["id"] == id:
@@ -35,7 +36,7 @@ def del_transaction(id):
 @app.route("/")
 def get_transactions():
     sorted_transactions = sorted(transactions, key = lambda x: x["date"], reverse=True)
-    return render_template("transactions.html", transactions=sorted_transactions)
+    return render_template("transactions.html", transactions=sorted_transactions, show_button=False)
 
 # Create operation
 @app.route("/add", methods=["GET", "POST"])
@@ -46,7 +47,9 @@ def add_transaction():
         else:
             id = max(entry["id"] for entry in transactions) + 1
         date = request.form["date"]
-        amount = request.form["amount"]
+        amount = float(request.form["amount"])
+        if amount.is_integer(): # Check if amount is a whole number
+            amount = int(amount)
         transaction = {
             "id": id,
             "date": date,
@@ -60,10 +63,13 @@ def add_transaction():
 @app.route("/edit/<int:transaction_id>", methods=["GET", "POST"])
 def edit_transaction(transaction_id):
     if request.method == "POST":
+        amount = float(request.form["amount"])
+        if amount.is_integer(): # Check if amount is a whole number
+            amount = int(amount)
         transaction = {
-            "id": transaction_id,
+            "id": int(transaction_id),
             "date": request.form["date"],
-            "amount": request.form["amount"]
+            "amount": amount
         }
         upd_transaction(transaction_id, transaction)
         return redirect(url_for("get_transactions"))
@@ -75,6 +81,19 @@ def edit_transaction(transaction_id):
 def delete_transaction(transaction_id):
     del_transaction(transaction_id)
     return redirect(url_for("get_transactions"))
+
+# Search functionality
+@app.route("/search", methods=["GET", "POST"])
+def search_transactions():
+    if request.method == "POST":
+        min_amount = float(request.form["min_amount"])
+        max_amount = float(request.form["max_amount"])
+        # Filtering transactions
+        filtered_transactions = [entry for entry in transactions if entry["amount"] >= min_amount and entry["amount"] <= max_amount]
+        # Sorting filtered transactions
+        sorted_transactions = sorted(filtered_transactions, key = lambda x: x["amount"], reverse=True)
+        return render_template("transactions.html", transactions=sorted_transactions, show_button=True)
+    return render_template("search.html")
 
 # Run the Flask app
 if __name__ == "__main__":

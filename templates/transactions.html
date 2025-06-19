@@ -35,8 +35,8 @@
         }
 
         .btn-primary:hover {
-            background-color: #f6d365;
-            border-color: #f6d365;
+            background-color: #f6d465dd;
+            border-color: #f6d465dd;
         }
     </style>
 </head>
@@ -66,8 +66,18 @@
             </tbody>
         </table>
 
-        <div class="d-flex justify-content-center">
-            <a class="btn btn-success" href="{{ url_for('add_transaction') }}">Add Transaction</a>
+        <div class="row">
+            <div class="col d-flex justify-content-start">
+                <a class="btn btn-primary" href="{{ url_for('search_transactions') }}">Search</a>
+            </div>
+            <div class="col d-flex justify-content-center">
+                <a class="btn btn-success" href="{{ url_for('add_transaction') }}">Add Transaction</a>
+            </div>
+            <div class="col d-flex justify-content-end">
+                {% if show_button %}
+                <a class="btn btn-success" href="{{ url_for('get_transactions') }}">Home</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>
