@@ -11,32 +11,51 @@ transactions = [
     {'id': 3, 'date': '2023-06-03', 'amount': 300}
 ]
 
+# Utility functions
 # Extract a single transaction
 def get_transaction(id):
-    for transaction in transactions:
-        if transaction["id"] == id:
-            return transaction
+    for entry in transactions:
+        if entry["id"] == id:
+            return entry
     return None
 
 # Update a single transaction
-def upd_transaction(id, new_transaction):
-    for transaction in transactions:
-        if transaction["id"] == id:
-            transaction.update(new_transaction)
+def upd_transaction(id, new_entry):
+    for entry in transactions:
+        if entry["id"] == id:
+            entry.update(new_entry)
             break
 
 # Delete a single transaction
 def del_transaction(id):
-    for i, transaction in enumerate(transactions):
-        if transaction["id"] == id:
+    for i, entry in enumerate(transactions):
+        if entry["id"] == id:
             del transactions[i]
             break
-        
+
+# Calculate total amount
+def calculate_total_amount(transactions):
+    total = 0
+    for entry in transactions:
+        total += entry["amount"]
+
+    # Handle data type
+    if total.is_integer():
+        total = int(total)
+
+    return total
+
+# API endpoints
 # Read operation
 @app.route("/")
 def get_transactions():
+    # Retrieve and sort transactions by date (latest first)
     sorted_transactions = sorted(transactions, key = lambda x: x["date"], reverse=True)
-    return render_template("transactions.html", transactions=sorted_transactions, show_button=False)
+
+    # Calculate total amount
+    total = calculate_total_amount(sorted_transactions)
+
+    return render_template("transactions.html", transactions=sorted_transactions, show_button=False, total_amount=total)
 
 # Create operation
 @app.route("/add", methods=["GET", "POST"])
@@ -46,17 +65,25 @@ def add_transaction():
             id = 1
         else:
             id = max(entry["id"] for entry in transactions) + 1
+
         date = request.form["date"]
         amount = float(request.form["amount"])
-        if amount.is_integer(): # Check if amount is a whole number
+
+        # Check if amount is a whole number
+        if amount.is_integer():
             amount = int(amount)
+
+        # Define and add new entry
         transaction = {
             "id": id,
             "date": date,
             "amount": amount
         }
         transactions.append(transaction)
+
         return redirect(url_for("get_transactions"))
+    
+    # GET request
     return render_template("form.html")
 
 # Update operation
@@ -64,8 +91,11 @@ def add_transaction():
 def edit_transaction(transaction_id):
     if request.method == "POST":
         amount = float(request.form["amount"])
-        if amount.is_integer(): # Check if amount is a whole number
+
+        # Check if amount is a whole number
+        if amount.is_integer():
             amount = int(amount)
+
         transaction = {
             "id": int(transaction_id),
             "date": request.form["date"],
@@ -73,6 +103,8 @@ def edit_transaction(transaction_id):
         }
         upd_transaction(transaction_id, transaction)
         return redirect(url_for("get_transactions"))
+    
+    # GET request
     transaction = get_transaction(transaction_id)
     return render_template("edit.html", transaction=transaction)
 
@@ -82,17 +114,23 @@ def delete_transaction(transaction_id):
     del_transaction(transaction_id)
     return redirect(url_for("get_transactions"))
 
-# Search functionality
+# Search operation
 @app.route("/search", methods=["GET", "POST"])
 def search_transactions():
     if request.method == "POST":
         min_amount = float(request.form["min_amount"])
         max_amount = float(request.form["max_amount"])
-        # Filtering transactions
+
+        # Filter transactions
         filtered_transactions = [entry for entry in transactions if entry["amount"] >= min_amount and entry["amount"] <= max_amount]
-        # Sorting filtered transactions
+
+        # Sort filtered transactions
         sorted_transactions = sorted(filtered_transactions, key = lambda x: x["amount"], reverse=True)
-        return render_template("transactions.html", transactions=sorted_transactions, show_button=True)
+
+        # Calculate total amount
+        total = calculate_total_amount(sorted_transactions)
+
+        return render_template("transactions.html", transactions=sorted_transactions, show_button=True, total_amount=total)
     return render_template("search.html")
 
 # Run the Flask app

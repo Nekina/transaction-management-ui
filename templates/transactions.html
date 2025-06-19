@@ -43,7 +43,7 @@
 <body>
     <div class="container">
         <h1 class="text-center">Transaction Records</h1>
-
+        <!-- Table -->
         <table class="table transaction-table">
             <thead>
                 <tr>
@@ -65,7 +65,10 @@
                 {% endfor %}
             </tbody>
         </table>
+        <!-- Total Balance -->
+        <h3 class="text-start">Total Balance: {{ total_amount }}</h3>
 
+        <!-- Buttons -->
         <div class="row">
             <div class="col d-flex justify-content-start">
                 <a class="btn btn-primary" href="{{ url_for('search_transactions') }}">Search</a>
