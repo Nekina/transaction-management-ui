@@ -8,7 +8,6 @@ A Flask-based web application offering a user interface and server-side operatio
 - Server-Side Rendering (SSR) using Flask and Jinja2 templates  
 - Built-in search to filter transactions by amount  
 - Modular routing and utility code for clarity and extensibility (e.g., `app.py`, `utils.py`)  
-- Practice-driven foundation following IBM's template for skill building
 
 ## Tech Stack
 
@@ -16,7 +15,6 @@ A Flask-based web application offering a user interface and server-side operatio
 - **Flask** – Lightweight web framework for routing and views  
 - **Jinja2** – Templating engine for server-rendered UI  
 - **HTML/CSS** – For front-end rendering  
-- Possibly **SQLite** or similar – For managing transaction data storage (if included or intended)  
 
 ## Installation and Setup
 
